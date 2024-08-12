@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .column{
+                float: left;
+                width: 50%
+            }
+
+            .row: :after{
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            body {
+            margin: 1;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+                    
+            .topnav {
+            overflow: hidden;
+            background-color: #333;
+            }
+
+            .topnav a {
+            float: left;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            }
+
+            .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+            }
+
+            .topnav a.active {
+            background-color: white;
+            color: black;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="topnav">
+        <a href="http://localhost:5000/Page_1/">Page 1</a>
+        <a class="active" href="http://localhost:5000/Page_2/">Page 2</a>
+        </div>
+
+    </body> 
+</html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Page 2</title>
+    <style>
+        .tooltip {
+          position: relative;
+          display: inline-block;
+          border-bottom: 1px dotted black;
+        }
+        
+        .tooltip .tooltiptext {
+          visibility: hidden;
+          width: 300px;
+          background-color: DimGrey;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px 0;
+          top: -5px;
+          left: 105%;
+          text-overflow: ellipsis;
+        
+          /* Position the tooltip */
+          position: absolute;
+          z-index: 1;
+        }
+        
+        .tooltip:hover .tooltiptext {
+          visibility: visible;
+        }
+
+
+
+        .strikethrough {
+            text-decoration: line-through;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    {% block Tasks %}
+        <div class="column">
+            <h1>Tasks for Today</h1>
+            {% if DataStoreTasks != {} %}
+                {% for task in DataStoreTasks.keys() %}
+                <li style="list-style-type: none;">
+                    <input type="checkbox" name="task" value="{{task}}" id="{{task}}" onclick="toggleStrikethrough(this)">
+                    <div class="tooltip">{{task}}
+                        <span class="tooltiptext">{{ DataStoreTasks[task] }}</span>
+                    </div>
+                {% endfor %}
+            </li>
+            <button type="button" onclick="removeTicked()">Remove Ticked</button>
+            {% else %}
+                <p>No tasks in the list right now!</p>
+            {% endif %}
+        </div>
+        
+
+    {% endblock %}
+    {% block content %}
+        <div class="column">
+            <h1>{% block Task %} Add New Tasks {% endblock %}</h1>
+            <form action="http://localhost:5000/Page_2/" method="post" id="taskForm">
+                {{ form.csrf_token }}
+                <p>
+                    {{ form.Task.label }}
+                    {{ form.Task(size=20) }}
+                </p>
+                {% if form.Task.errors %}
+                    <ul class="errors">
+                        {% for error in form.Task.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <p>
+                    {{ form.TaskDesc.label }}
+                </p>
+                {{ form.TaskDesc(rows=3, cols=50) }}
+                {% if form.TaskDesc.errors %}
+                    <ul class="errors">
+                        {% for error in form.TaskDesc.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                <p>
+                    <button type="submit" name="button" value="submit">Submit</button>
+                    <button type="button" onclick="clearInputField()">Clear Input</button>
+                </p>
+            </form>
+        </div>
+    {% endblock %}
+    <script>
+        function clearInputField() {
+            console.log("Clear Input Field function called");
+            document.querySelector("[name='Task']").value = "";
+            document.querySelector("[name='TaskDesc']").value = "";
+        }
+    </script>
+    <script>
+        function toggleStrikethrough(checkbox) {
+            const taskElement = checkbox.nextElementSibling;
+            const taskName = checkbox.value;
+            const taskDesc = taskElement.querySelector('.tooltiptext').innerText;
+    
+            if (checkbox.checked) {
+                taskElement.classList.add('strikethrough');
+                // Send AJAX request to delete the task
+            } else {
+                taskElement.classList.remove('strikethrough');
+            }
+        }
+    </script>
+    <script>
+        function removeTicked() {
+            console.log("Remove Ticked function called");
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name="task"]');
+            
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const taskElement = checkbox.nextElementSibling;
+                    const taskName = checkbox.value;
+    
+                    // Send AJAX request to delete the task
+                    fetch('/delete_task', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ task: taskName }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                        // Remove the task element from the DOM
+                        taskElement.parentElement.remove();
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

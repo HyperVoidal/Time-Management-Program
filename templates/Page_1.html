@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .column{
+                float: left;
+            }
+
+            .right{
+                width=35%
+            }
+
+            .left{
+                width=65%
+            }
+
+            .row: :after{
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            body {
+            margin: 1;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .topnav {
+            overflow: hidden;
+            background-color: #333;
+            }
+
+            .topnav a {
+            float: left;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            }
+
+            .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+            }
+
+            .topnav a.active {
+            background-color: white;
+            color: black;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="topnav">
+        <a class="active" href="http://localhost:5000/Page_1/">Page 1</a>
+        <a href="http://localhost:5000/Page_2/">Page 2</a>
+        </div>
+
+    </body>
+</html>
+
+<html>
+    <body>
+        <script>
+            function ReloadPage() {
+                location.reload();
+            }
+
+            async function ShowAll() {
+                try {
+                    const cacheBuster = new Date().getTime(); // Generate a unique timestamp
+                    const response = await fetch(`/static/AppReaderData.json?cb=${cacheBuster}`);
+                    const data = await response.json();
+                    const appList = document.getElementById('appList');
+                    console.log(data)
+                    // Convert the object into an array of key-value pairs
+                    const dataArray = Object.entries(data);
+                    
+                    // Sort the array by elapsed time in descending order
+                    dataArray.sort((a, b) => b[1].elapsed - a[1].elapsed);
+
+
+                    appList.innerHTML = ''; // Clear any existing content
+
+                    for (const [app, details] of Object.entries(data)) {
+                        const listItem = document.createElement('li');
+                        let hours = Math.round(details.elapsed/3600);
+                        if hours < 1 {
+                            hours = "> 1";
+                        }
+                        listItem.textContent = `${app}: Elapsed Time - ${hours} hours`;
+                        appList.appendChild(listItem);
+                    }
+                } catch (error) {
+                    console.error('Error fetching or parsing JSON data:', error);
+                }
+            }
+        </script>
+        {% block GraphArea %}
+        <div class="column left">
+            <h1>Simplified Graph</h1>
+            <img alt="Unable to load graph, please try again in a few seconds!" src={{url_for('static', filename='Column.png')}}>
+            <li>
+            <button onclick="ReloadPage()">Refresh Graph</button>
+        </div>
+        {% endblock GraphArea %}
+        {% block AllApps %}
+        <div class="column right">
+            <h1>App List</h1>
+            <button onclick="ShowAll()">Show all apps</button>
+            <ul id="appList"></ul> <!-- Add this element to display the list of apps -->
+        </div>
+        {% endblock AllApps %}
+    </body>
+</html>
