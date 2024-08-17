@@ -10,14 +10,14 @@
             }
 
             .right{
-                width=35%
+                width:35%;
             }
 
             .left{
-                width=65%
+                width:65%;
             }
 
-            .row: :after{
+            .row :after{
                 content: "";
                 display: table;
                 clear: both;
@@ -76,12 +76,13 @@
                     const response = await fetch(`/static/AppReaderData.json?cb=${cacheBuster}`);
                     const data = await response.json();
                     const appList = document.getElementById('appList');
-                    console.log(data)
-                    // Convert the object into an array of key-value pairs
-                    const dataArray = Object.entries(data);
-                    
-                    // Sort the array by elapsed time in descending order
-                    dataArray.sort((a, b) => b[1].elapsed - a[1].elapsed);
+                    console.log(data);
+                    /* for (const [app, details] of Object.entries(data)) {
+                        if (details.elapsed < 3600) {
+                            delete data[app];
+                        }
+                    } */
+                   //For later stuff if needed, trims out apps that have been used for less than an hour
 
 
                     appList.innerHTML = ''; // Clear any existing content
@@ -89,7 +90,7 @@
                     for (const [app, details] of Object.entries(data)) {
                         const listItem = document.createElement('li');
                         let hours = Math.round(details.elapsed/3600);
-                        if hours < 1 {
+                        if (hours < 1) {
                             hours = "> 1";
                         }
                         listItem.textContent = `${app}: Elapsed Time - ${hours} hours`;
@@ -102,7 +103,7 @@
         </script>
         {% block GraphArea %}
         <div class="column left">
-            <h1>Simplified Graph</h1>
+            <h1>Most Used Apps</h1>
             <img alt="Unable to load graph, please try again in a few seconds!" src={{url_for('static', filename='Column.png')}}>
             <li>
             <button onclick="ReloadPage()">Refresh Graph</button>

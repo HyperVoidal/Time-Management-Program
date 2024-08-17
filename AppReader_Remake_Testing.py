@@ -76,18 +76,27 @@ class AppReader():
                 self.apptime[app] = {'cur_time': round(current_time, 0), 'elapsed': 0}  # current_time is already rounded
                 
     def AppRelease(self):
+        #Sorting algorith here - descending order
+        self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
+
         for app_name, time in self.apptime.items():
             # Update the time for the app in self.appslist
             self.appslist[app_name] = (f"{time['elapsed']} seconds")
+        
 
 def update_graph(timedisplay):
     try:
         ax.clear()
-        app_names = list(AppReader.appslist.keys())
-        for i in (AppReader.appslist.values()):
+        smalllist = {}
+        smalllist = AppReader.appslist
+        #If there are more than 15 apps, only display the top 15
+        if len(smalllist) > 25:
+            smalllist = dict(list(smalllist.items())[:25])
+        app_names = list(smalllist.keys())
+        for i in (smalllist.values()):
             values = i.split(" ")
             value = values[0]
-            maximum = max([int(round(float(value.split(" ")[0]), 0)) for value in AppReader.appslist.values()])
+            maximum = max([int(round(float(value.split(" ")[0]), 0)) for value in smalllist.values()])
             if maximum > 60 and maximum < 3600:
                 timedisplay = "Minutes"
                 break
@@ -101,16 +110,16 @@ def update_graph(timedisplay):
                 pass
             
         if timedisplay == "Seconds":
-            times = [int(round(float(time.split(" ")[0]), 0)) for time in AppReader.appslist.values()]
+            times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllist.values()]
         elif timedisplay == "Minutes":
-            times = [(int(round(float(time.split(' ')[0]), 0)))/60 for time in AppReader.appslist.values()]
+            times = [(int(round(float(time.split(' ')[0]), 0)))/60 for time in smalllist.values()]
         elif timedisplay == "Hours":
-            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in AppReader.appslist.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllist.values()]
         elif timedisplay == "Days":
-            times = [(int(round(float(time.split(" ")[0]), 0)))/86400 for time in AppReader.appslist.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/86400 for time in smalllist.values()]
         else:
             print("Error: Invalid time display. Defaulting to hours.")
-            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in AppReader.appslist.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllist.values()]
             timedisplay = "Hours"
                 
         color_indices = np.arange(len(app_names))
@@ -138,7 +147,8 @@ def update_graph(timedisplay):
         pass
 
     return timedisplay
-    
+
+#Recommended next avenue is to add alternative graph methods such as pie chart and/or time based records e.g. previous day, week, month, year.
     
 def scan():
     while True:
