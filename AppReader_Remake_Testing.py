@@ -11,6 +11,7 @@ truepath = os.path.dirname(os.path.abspath(__file__))
 path = truepath  + "\\static\\AppReaderData.json"
 fig, ax = plt.subplots(figsize=(7,4))
 columngraphpath = truepath + "\\static\\Column.png"
+piechartpath = truepath + "\\static\\Pie.png"
 timedisplay = "Seconds"
 
 class AppReader():
@@ -148,6 +149,49 @@ def update_graph(timedisplay):
 
     return timedisplay
 
+def piechart():
+    try:
+        ax.clear()
+        smalllist = {}
+        smalllist = AppReader.appslist
+        #If there are more than 10 apps, only display the top 10
+        if len(smalllist) > 9:
+            otherlist = dict(list(smalllist.items())[9:])
+            otherlist = [int(round(float(time.split(" ")[0]), 0)) for time in otherlist.values()]
+            totalsum = 0
+            for i in range(len(otherlist)):
+                totalsum += otherlist[i]
+            smalllist = dict(list(smalllist.items())[:9])
+            smalllist["Other"] = f"{totalsum} seconds"
+                        
+        app_names = list(smalllist.keys())
+        total = 0
+        for i in (smalllist.values()):
+            total += int(round(float(i.split(" ")[0]), 0))
+            
+        for i in range(len(app_names)):
+            for i in range(len(app_names)):
+                if len(app_names[i]) > 23:
+                    theappnames = app_names[i][:20] + "..."
+                    app_names[i] = theappnames
+                    
+        times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllist.values()]
+        color_indices = np.arange(len(app_names))
+        cmap = plt.colormaps.get_cmap("twilight")
+        colors = [cmap(index*15) for index in color_indices]
+        ax.pie(times, labels=app_names, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.axis('equal')
+        ax.set_title('App Usage Time')
+        plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
+        plt.savefig(piechartpath)
+        
+    except Exception as e:
+        print("GRAPH ERROR:")
+        print(e)
+        print(traceback.format_exc())
+        time.sleep(2)
+        pass
+
 #Recommended next avenue is to add alternative graph methods such as pie chart and/or time based records e.g. previous day, week, month, year.
     
 def scan():
@@ -183,6 +227,7 @@ thread.start()
 time.sleep(5)
 while True:
     update_graph(timedisplay)
+    piechart()
     UpdateJson(AppReader.apptime, path)
     time.sleep(0.5)
     
