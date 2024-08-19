@@ -179,9 +179,10 @@ def piechart():
         color_indices = np.arange(len(app_names))
         cmap = plt.colormaps.get_cmap("twilight")
         colors = [cmap(index*15) for index in color_indices]
-        ax.pie(times, labels=app_names, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.pie(times, autopct='%1.1f%%', startangle=90, colors=colors)
         ax.axis('equal')
         ax.set_title('App Usage Time')
+        ax.legend(app_names, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(piechartpath)
         
