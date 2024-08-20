@@ -51,6 +51,35 @@
             background-color: white;
             color: black;
             }
+
+            .tooltip {
+            position: relative;
+            display: inline-block;
+
+            }
+              
+            .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 100px;
+            background-color: DimGrey;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            top: -5px;
+            left: 105%;
+
+
+
+
+
+            }
+              
+            .tooltip:hover .tooltiptext {
+            visibility: visible;
+            }
         </style>
     </head>
     
@@ -77,24 +106,33 @@
                     const data = await response.json();
                     const appList = document.getElementById('appList');
                     console.log(data);
-                    /* for (const [app, details] of Object.entries(data)) {
-                        if (details.elapsed < 3600) {
-                            delete data[app];
-                        }
-                    } */
-                   //For later stuff if needed, trims out apps that have been used for less than an hour
-
-
                     appList.innerHTML = ''; // Clear any existing content
 
-                    for (const [app, details] of Object.entries(data)) {
+                    for (var [app, details] of Object.entries(data)) {
                         const listItem = document.createElement('li');
-                        let hours = Math.round(details.elapsed/3600);
-                        if (hours < 1) {
-                            hours = "> 1";
+                        let hours = Math.round(((details.elapsed/3600)*100));
+                        let hour = hours/100;
+                        if (hour < 1) {
+                            hour = "> 1";
                         }
-                        listItem.textContent = `${app} - ${hours} hours`;
+
+                        const tooltipSpan = document.createElement('span');
+                        tooltipSpan.className = 'tooltiptext';
+                        tooltipSpan.textContent = app;
+                        
+                        const tooltipDiv = document.createElement('div');
+                        tooltipDiv.className = 'tooltip';
+                        
+                        if (app.length > 20) {
+                            app = app.substring(0, 20) + "...";
+                        }
+                        
+                        tooltipDiv.textContent = `${app} - ${hour} hours`;
+                        tooltipDiv.appendChild(tooltipSpan);
+                        
+                        listItem.appendChild(tooltipDiv);
                         appList.appendChild(listItem);
+
                     }
                 } catch (error) {
                     console.error('Error fetching or parsing JSON data:', error);
@@ -113,7 +151,7 @@
         <div class="column right">
             <h1>App List</h1>
             <button onclick="ShowAll()">Show all apps</button>
-            <ul id="appList"></ul> <!-- Add this element to display the list of apps -->
+            <ul id="appList"></ul>
         </div>
         {% endblock AllApps %}
     </body>

@@ -37,6 +37,11 @@ class AppReader():
                 titletest = thetitletest[-1]
             if " - " not in titletest:
                 titletest = titletest
+            if "\u2014" in titletest:
+                thetitletest = titletest.split("\u2014")
+                titletest = thetitletest[-1]
+            if titletest[0] == " ":
+                titletest = titletest[1:]
             modified_apps.append(titletest)  # Append the modified title to the new list
         self.appsrunning.clear()
         self.appsrunning = modified_apps  # Replace the original list with the modified list
@@ -121,7 +126,7 @@ def update_graph(timedisplay):
             timedisplay = "Hours"
                 
         color_indices = np.arange(len(app_names))
-        cmap = plt.colormaps.get_cmap("viridis")
+        cmap = plt.colormaps.get_cmap("twilight")
         colors = [cmap(index*15) for index in color_indices]
         appernames = []
         appernames.extend(app_names)
@@ -182,7 +187,7 @@ def piechart():
                     
         times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllist.values()]
         color_indices = np.arange(len(appernames))
-        cmap = plt.colormaps.get_cmap("viridis")
+        cmap = plt.colormaps.get_cmap("twilight")
         colors = [cmap(index*15) for index in color_indices]
         ax.pie(times, autopct='%1.1f%%', startangle=0, colors=colors)
         ax.axis('equal')
