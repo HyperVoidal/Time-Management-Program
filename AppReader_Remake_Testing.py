@@ -37,9 +37,6 @@ class AppReader():
                 titletest = thetitletest[-1]
             if " - " not in titletest:
                 titletest = titletest
-            if len(titletest) > 20:
-                thetitletest = titletest[:17] + "..."
-                titletest = thetitletest
             modified_apps.append(titletest)  # Append the modified title to the new list
         self.appsrunning.clear()
         self.appsrunning = modified_apps  # Replace the original list with the modified list
@@ -126,13 +123,15 @@ def update_graph(timedisplay):
         color_indices = np.arange(len(app_names))
         cmap = plt.colormaps.get_cmap("viridis")
         colors = [cmap(index*15) for index in color_indices]
+        appernames = []
+        appernames.extend(app_names)
         for i in range(len(app_names)):
             for i in range(len(app_names)):
                 if len(app_names[i]) > 23:
                     theappnames = app_names[i][:20] + "..."
-                    app_names[i] = theappnames
+                    appernames[i] = theappnames
 
-        ax.bar(app_names, times, color=colors, edgecolor="black")
+        ax.bar(appernames, times, color=colors, edgecolor="black")
         ax.set_xlabel('App Name')
         ax.set_ylabel(f'Time ({timedisplay})')
         ax.set_title('App Usage Time')
@@ -155,7 +154,7 @@ def piechart():
         smalllist = {}
         smalllist = AppReader.appslist
         #If there are more than 10 apps, only display the top 10
-        if len(smalllist) > 9:
+        if len(smalllist) > 10:
             otherlist = dict(list(smalllist.items())[9:])
             otherlist = [int(round(float(time.split(" ")[0]), 0)) for time in otherlist.values()]
             totalsum = 0
@@ -163,26 +162,32 @@ def piechart():
                 totalsum += otherlist[i]
             smalllist = dict(list(smalllist.items())[:9])
             smalllist["Other"] = f"{totalsum} seconds"
+        #Sort smalllist from largest to smallest value
+        smalllist = dict(sorted(smalllist.items(), key=lambda x: int(round(float(x[1].split(" ")[0]), 0)), reverse=True))
+        
+            
                         
         app_names = list(smalllist.keys())
         total = 0
         for i in (smalllist.values()):
             total += int(round(float(i.split(" ")[0]), 0))
-            
+        
+        appernames = []
+        appernames.extend(app_names)
         for i in range(len(app_names)):
             for i in range(len(app_names)):
                 if len(app_names[i]) > 23:
                     theappnames = app_names[i][:20] + "..."
-                    app_names[i] = theappnames
+                    appernames[i] = theappnames
                     
         times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllist.values()]
-        color_indices = np.arange(len(app_names))
-        cmap = plt.colormaps.get_cmap("twilight")
+        color_indices = np.arange(len(appernames))
+        cmap = plt.colormaps.get_cmap("viridis")
         colors = [cmap(index*15) for index in color_indices]
-        ax.pie(times, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.pie(times, autopct='%1.1f%%', startangle=0, colors=colors)
         ax.axis('equal')
         ax.set_title('App Usage Time')
-        ax.legend(app_names, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
+        ax.legend(appernames, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(piechartpath)
         
