@@ -1,5 +1,7 @@
 import pyautogui
 import time
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -9,7 +11,6 @@ import traceback
 
 truepath = os.path.dirname(os.path.abspath(__file__))
 path = truepath  + "\\static\\AppReaderData.json"
-fig, ax = plt.subplots(figsize=(7,4))
 columngraphpath = truepath + "\\static\\Column.png"
 piechartpath = truepath + "\\static\\Pie.png"
 timedisplay = "Seconds"
@@ -88,8 +89,9 @@ class AppReader():
         
 
 def update_graph(timedisplay):
+    fig1, ax1 = plt.subplots(figsize=(7,4))
     try:
-        ax.clear()
+        ax1.clear()
         smalllist = {}
         smalllist = AppReader.appslist
         #If there are more than 15 apps, only display the top 15
@@ -136,14 +138,15 @@ def update_graph(timedisplay):
                     theappnames = app_names[i][:20] + "..."
                     appernames[i] = theappnames
 
-        ax.bar(appernames, times, color=colors, edgecolor="black")
-        ax.set_xlabel('App Name')
-        ax.set_ylabel(f'Time ({timedisplay})')
-        ax.set_title('App Usage Time')
+        ax1.bar(appernames, times, color=colors, edgecolor="black")
+        ax1.set_xlabel('App Name')
+        ax1.set_ylabel(f'Time ({timedisplay})')
+        ax1.set_title('App Usage Time')
         plt.grid(True, which="both", linestyle="--", linewidth=0.5, color="gray", axis="y")
         plt.xticks(rotation = 45, ha="right")
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(columngraphpath)
+        plt.close(fig1)
     except Exception as e:
         print("GRAPH ERROR:")
         print(e)
@@ -154,8 +157,9 @@ def update_graph(timedisplay):
     return timedisplay
 
 def piechart():
+    fig2, ax2 = plt.subplots(figsize=(7,4))
     try:
-        ax.clear()
+        ax2.clear()
         smalllist = {}
         smalllist = AppReader.appslist
         #If there are more than 10 apps, only display the top 10
@@ -189,13 +193,13 @@ def piechart():
         color_indices = np.arange(len(appernames))
         cmap = plt.colormaps.get_cmap("twilight")
         colors = [cmap(index*15) for index in color_indices]
-        ax.pie(times, autopct='%1.1f%%', startangle=0, colors=colors)
-        ax.axis('equal')
-        ax.set_title('App Usage Time')
-        ax.legend(appernames, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
+        ax2.pie(times, autopct='%1.1f%%', startangle=0, colors=colors)
+        ax2.axis('equal')
+        ax2.set_title('App Usage Time')
+        ax2.legend(appernames, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(piechartpath)
-        
+        plt.close(fig2)
     except Exception as e:
         print("GRAPH ERROR:")
         print(e)
@@ -203,7 +207,7 @@ def piechart():
         time.sleep(2)
         pass
 
-#Recommended next avenue is to add alternative graph methods such as pie chart and/or time based records e.g. previous day, week, month, year.
+#Recommended next avenue is to add alternative graph methods such as time based records e.g. previous day, week, month, year.
     
 def scan():
     while True:
