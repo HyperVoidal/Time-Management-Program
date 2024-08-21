@@ -1,10 +1,21 @@
 <!doctype html>
+<style>
+
+</style>
+<head>
+    <title>Hello from Flask</title>
+    <h1>Login to AppScan</h1>
+</head>
 <html>
    <body>
-        <form action="http://localhost:5000/home" method="post">
-            <button type="submit" name="button" value="Page 1">Go to Page 1</button>
-            <button type="submit" name="button" value="Page 2">Go to Page 2</button>
+        <form action="http://localhost:5000/login" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+            <input type="submit" value="Login", name="login">
         </form>
-        
    </body>
 </html>

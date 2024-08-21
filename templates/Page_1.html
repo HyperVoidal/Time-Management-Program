@@ -55,7 +55,6 @@
             .tooltip {
             position: relative;
             display: inline-block;
-
             }
               
             .tooltip .tooltiptext {
@@ -70,11 +69,6 @@
             z-index: 1;
             top: -5px;
             left: 105%;
-
-
-
-
-
             }
               
             .tooltip:hover .tooltiptext {
@@ -108,56 +102,39 @@
                     console.log(data);
                     appList.innerHTML = ''; // Clear any existing content
                     
-                    /*
-                    for (var [app, details] of Object.entries(data)) {
+                    for (const [app, details] of Object.entries(data)) {
                         const listItem = document.createElement('li');
+                        let printtime;
                         if (details.elapsed < 60) {
-                            let printtime = hour + " seconds";
+                            printtime = details.elapsed + " seconds";
                         }
-                        elif (60 < details.elapsed < 3600) {
-                            let printtime = Math.round(details.elapsed/60) + " minutes";
+                        else if (details.elapsed < 3600) {
+                            printtime = Math.round(details.elapsed/60) + " minutes";
                         }
-                        elif (3600 < details.elapsed < 86400) {
-                            let printtime = Math.round(details.elapsed/3600) + " hours";
+                        else if (details.elapsed < 86400) {
+                            printtime = Math.round(details.elapsed/3600) + " hours";
                         }
-                        elif (86400 < details.elapsed < 604800) {
-                            let printtime = Math.round(details.elapsed/86400) + " days";
+                        else if (details.elapsed < 604800) {
+                            printtime = Math.round(details.elapsed/86400) + " days";
                         }
                         else {
-                            let printtime = Math.round(details.elapsed/3600) + " hours";
-                        }
-
-                        const tooltipSpan = document.createElement('span');
-                        tooltipSpan.className = 'tooltiptext';
-                        tooltipSpan.textContent = app + " " + details.elapsed; */
-
-                        //Alternate version, still needs work as it keeps crashing for an unknown reason.
-
-                    for (var [app, details] of Object.entries(data)) {
-                        const listItem = document.createElement('li');
-                        let hours = Math.round(((details.elapsed/3600)*100));
-                        let hour = hours/100;
-                        if (hour < 1) {
-                            hour = "<1";
+                            printtime = Math.round(details.elapsed/3600) + " hours";
                         }
 
                         const tooltipSpan = document.createElement('span');
                         tooltipSpan.className = 'tooltiptext';
                         tooltipSpan.textContent = app;
-                        
+
                         const tooltipDiv = document.createElement('div');
                         tooltipDiv.className = 'tooltip';
                         
-                        if (app.length > 20) {
-                            app = app.substring(0, 20) + "...";
-                        }
+                        let displayApp = app.length > 20 ? app.substring(0, 20) + "..." : app;
                         
-                        tooltipDiv.textContent = `${app} - ${hour} hours`;
+                        tooltipDiv.textContent = `${displayApp} - ${printtime}`;
                         tooltipDiv.appendChild(tooltipSpan);
                         
                         listItem.appendChild(tooltipDiv);
                         appList.appendChild(listItem);
-
                     }
                 } catch (error) {
                     console.error('Error fetching or parsing JSON data:', error);

@@ -71,17 +71,16 @@ def page_2():
     return render_template('Page_2.html', form=form, DataStoreTasks=DataStoreTasks)
 
 
-@app.route('/home', methods=['POST', 'GET'])
-def home():
+@app.route('/login', methods=['POST', 'GET'])
+def login():
     if request.method == 'POST':
-        button_value = request.form.get('button')  # Assuming the name of the button input is 'button'
-        if button_value == 'Page 1':
+        button_value = request.form.get('login')  # Assuming the name of the button input is 'button'
+        if button_value == 'Login':
             return render_template('Page_1.html')
-        elif button_value == 'Page 2':
-            form = TaskForm()
-            return render_template('Page_2.html', form=form, DataStoreTasks=DataStoreTasks)
     # If GET or no recognized button value, stay on the login page or handle accordingly
     return 'Button Error'
+
+#Perhaps turn into a login page?
 
 @app.route('/delete_task', methods=['POST'])
 def delete_task():
