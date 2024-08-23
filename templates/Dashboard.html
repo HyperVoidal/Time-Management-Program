@@ -97,6 +97,7 @@
     
     
 </head>
+
 <body>
     <h1>Dashboard</h1>
     {% block DailyTasks %}
@@ -114,5 +115,15 @@
         </li>
         {% endif %}
     {% endblock %}
-
+    
+    {% block DailyTime %}
+    <div class="column right">
+        <h2>Daily Time</h2>
+        {% comment %} 
+        Create a way to find the current times of the country that the user is in
+        Create a function to add to AppReader code that creates a graph from the data of only a single day
+        The data for the graph should be stored in a seperate json file from the rest of initial
+        The data for the graph should reset at 12am every day as determined by the user's time zone
+        {% endcomment %}
+    {% endblock %}
 </body>
