@@ -2,6 +2,7 @@
 <html lang="en">
 
 <html>
+    <title>AppScan - Page 1</title>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -34,12 +35,13 @@
             }
 
             .topnav a {
-            float: left;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 17px;
+                float: left;
+                width:33.33%;
+                color: white;
+                text-align: center;
+                padding: 20px 0px;
+                text-decoration: none;
+                font-size: 17px;
             }
 
             .topnav a:hover {
@@ -79,6 +81,7 @@
     
     <body>
         <div class="topnav">
+        <a href="http://localhost:5000/dashboard">Dashboard</a>
         <a class="active" href="http://localhost:5000/Page_1/">Page 1</a>
         <a href="http://localhost:5000/Page_2/">Page 2</a>
         </div>
@@ -123,7 +126,7 @@
 
                         const tooltipSpan = document.createElement('span');
                         tooltipSpan.className = 'tooltiptext';
-                        tooltipSpan.textContent = app;
+                        tooltipSpan.textContent = app + " - " + Math.round(details.elapsed/3600) + " hours";
 
                         const tooltipDiv = document.createElement('div');
                         tooltipDiv.className = 'tooltip';

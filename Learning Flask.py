@@ -71,68 +71,12 @@ def page_2():
     return render_template('Page_2.html', form=form, DataStoreTasks=DataStoreTasks)
 
 
-@app.route('/login', methods=['POST', 'GET'])
-def login():
-    if request.method == 'POST':
-        button_value = request.form.get('login')
-        button_value2 = request.form.get('Register')
-        if button_value == 'Login':
-            usernameentered = request.form.get('username')
-            passwordentered = request.form.get('password')
-            try:
-                with open ("User&Pass.json", "r") as f:
-                    userdata = json.load(f)
-                if usernameentered in userdata.keys():
-                    if passwordentered == userdata[usernameentered]:
-                        return render_template('Page_1.html')
-                    else:
-                        return render_template('Login.html')
-                else:
-                    return render_template('Login.html')
-            except json.decoder.JSONDecodeError:
-                print("No data in file")
-                pass
-        elif button_value2 == 'Register':
-            return render_template('Register.html', href='/Register')
-        
-    # If GET or no recognized button value, stay on the login page or handle accordingly
-    return render_template('Login.html')
+@app.route('/dashboard', methods=['POST', 'GET'])
+def dashboard():
+    with open ('TaskStorage.json', 'w') as f:
+        json.dump(DataStoreTasks, f)
+    return render_template('Dashboard.html', DataStoreTasks=DataStoreTasks)
 
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    if request.method == 'POST':
-        button_value = request.form.get('Register')
-        if button_value == 'Register':
-            usernameentered = request.form.get('username')
-            passwordentered = request.form.get('password')
-            with open ("User&Pass.json", "r") as f:
-                try:
-                    userdata = json.load(f)
-                except json.decoder.JSONDecodeError:
-                    userdata = {}
-                    
-            try:
-                    
-                if usernameentered in userdata.keys():
-                    print("Username already exists")
-                
-            except json.decoder.JSONDecodeError:
-                pass
-            
-            except Exception as e:
-                print(f"Data error:")
-                print(e)
-            
-            userdata[usernameentered] = passwordentered
-            with open ("User&Pass.json", "w") as f:
-                json.dump(userdata, f)
-            return render_template('Login.html')
-    
-        elif button_value == 'Login':
-                return render_template('Login.html')
-
-    # If GET or no recognized button value, stay on the login page or handle accordingly
-    return render_template('Register.html')
             
 @app.route('/delete_task', methods=['POST'])
 def delete_task():

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <title>AppScan - Page 2</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .column{
+                float: left;
+                width: 50%
+            }
+
+            .row: :after{
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            body {
+            margin: 1;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+                    
+            .topnav {
+            overflow: hidden;
+            background-color: #333;
+            }
+
+            .topnav a {
+                float: left;
+                width:33.33%;
+                color: white;
+                text-align: center;
+                padding: 20px 0px;
+                text-decoration: none;
+                font-size: 17px;
+            }
+
+            .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+            }
+
+            .topnav a.active {
+            background-color: white;
+            color: black;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="topnav">
+        <a class="active" href="http://localhost:5000/dashboard">Dashboard</a>
+        <a href="http://localhost:5000/Page_1/">Page 1</a>
+        <a href="http://localhost:5000/Page_2/">Page 2</a>
+        </div>
+
+    </body> 
+</html>
+<head>
+    <meta charset="UTF-8">
+    <title>Page 2</title>
+    <style>
+        .tooltip {
+          position: relative;
+          display: inline-block;
+          border-bottom: 1px dotted black;
+        }
+        
+        .tooltip .tooltiptext {
+          visibility: hidden;
+          width: 300px;
+          background-color: DimGrey;
+          color: #fff;
+          text-align: center;
+          border-radius: 6px;
+          padding: 5px 0;
+          top: -5px;
+          left: 105%;
+          text-overflow: ellipsis;
+        
+          /* Position the tooltip */
+          position: absolute;
+          z-index: 1;
+        }
+        
+        .tooltip:hover .tooltiptext {
+          visibility: visible;
+        }
+
+
+
+        .strikethrough {
+            text-decoration: line-through;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <h1>Dashboard</h1>
+    {% block DailyTasks %}
+    <div class="column left">
+        <h2>Daily Tasks</h2>
+        <br>
+        {% if DataStoreTasks != {} %}
+            {% for task in DataStoreTasks.keys() %}
+            <li style="list-style-type: none;">
+                <type="text" name="task" value="{{task}}" id="{{task}}">
+                <div class="tooltip">{{task}}
+                    <span class="tooltiptext">{{ DataStoreTasks[task] }}</span>
+                </div>
+            {% endfor %}
+        </li>
+        {% endif %}
+    {% endblock %}
+
+</body>
