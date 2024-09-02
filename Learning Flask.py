@@ -18,8 +18,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'the key oooh'
 
 class TaskForm(FlaskForm): 
-    Task = StringField('Name', validators=[InputRequired()])
-    TaskDesc = TextAreaField('Description', validators=[InputRequired(), Length(max=100)])
+    Task = StringField('Name', validators=[InputRequired(), Length(max=50)])
+    TaskDesc = TextAreaField('Description', validators=[InputRequired(), Length(max=200)])
 
     
 

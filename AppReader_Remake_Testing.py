@@ -21,14 +21,13 @@ class AppReader():
         self.appsrunning = []
         self.apptime = {}
         self.appslist = {}
+        self.endingtime = 0
 
     def AppNameEdit(self):
-        #Add another name editor for app names that are part of the same action but have different names
-        #e.g. mozilla firefox - new tab, and mozilla firefox - stackoverflow, should become the same name
-        modified_apps = []  # Initialize a new list for modified titles
+        modified_apps = []
         for x in self.appsrunning:
             titletest = x
-            if titletest in ["", " ", "    ", " - "]:  # Simplified check for empty or specific strings
+            if titletest in ["", " ", "    ", " - "]:
                 titletest = "UNKNOWN APP"
             if " - " in titletest:
                 thetitletest = titletest.split(" - ")
@@ -43,9 +42,9 @@ class AppReader():
                 titletest = thetitletest[-1]
             if titletest[0] == " ":
                 titletest = titletest[1:]
-            modified_apps.append(titletest)  # Append the modified title to the new list
+            modified_apps.append(titletest)
         self.appsrunning.clear()
-        self.appsrunning = modified_apps  # Replace the original list with the modified list
+        self.appsrunning = modified_apps
     
     def AppRunning(self):
         self.appsrunning.extend([window.title for window in pyautogui.getAllWindows()])
@@ -54,47 +53,54 @@ class AppReader():
         self.appsrunning = [x for x in self.appsrunning if not (x in seen or seen.add(x))]
     
     def UpdateRunningApps(self):
-        # Fetch the current list of running apps
         current_running_apps = [window.title for window in pyautogui.getAllWindows()]
         current_running_apps = [x for x in current_running_apps if x.strip() and x != ""]
-
-        # Filter out apps that are no longer running from self.appsrunning
-        # Do not modify self.apptime here to ensure time persists
         self.appsrunning = [app for app in self.appsrunning if app in current_running_apps]
 
     def AppTimer(self):
-        current_time = round(time.time())  # Ensure current_time is rounded at the source
+        current_time = round(time.time())
         for app in self.appsrunning:
             if app in self.apptime:
-                # Validate appchoose is a dictionary and has 'cur_time'
                 if isinstance(self.apptime[app], dict) and 'cur_time' in self.apptime[app]:
                     appchoose = self.apptime[app]
-                    # Ensure elapsed_time is rounded immediately after calculation
                     elapsed_times = int(round(current_time - appchoose['cur_time']))
                     elapsed_time = round(elapsed_times, 0)
-                    self.apptime[app]['elapsed'] = elapsed_time  # Convert to int to ensure compatibility
+                    self.apptime[app]['elapsed'] += elapsed_time
+                    self.apptime[app]['cur_time'] = current_time
                 else:
                     print(f"Error: appchoose for {app} is not properly formatted. Current value: {self.apptime[app]}")
             else:
-                # For new apps, ensure 'cur_time' is rounded before being set
-                self.apptime[app] = {'cur_time': round(current_time, 0), 'elapsed': 0}  # current_time is already rounded
-                
-    def AppRelease(self):
-        #Sorting algorith here - descending order
-        self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
+                self.apptime[app] = {'cur_time': current_time, 'elapsed': 0}
 
-        for app_name, time in self.apptime.items():
-            # Update the time for the app in self.appslist
-            self.appslist[app_name] = (f"{time['elapsed']} seconds")
+    def reset_timer(self):
+        with open(f"{truepath}\\SequentialEndingTime.json", "r") as f:
+            endingtime = f.read()
+            endingtime = json.loads(endingtime)
         
+        ending_time = endingtime["end_time"]
+        self.endingtime = ending_time
+
+    def start_session(self):
+        self.reset_timer(AppReader)
+        current_time = round(time.time())
+        time_diff = current_time - self.endingtime
+        for app in self.apptime:
+            if 'elapsed' in self.apptime[app]:
+                self.apptime[app]['elapsed'] += time_diff
+            else:
+                self.apptime[app]['elapsed'] = time_diff
+            self.apptime[app]['cur_time'] = current_time
+
+    def AppRelease(self):
+        self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
+        for app_name, time in self.apptime.items():
+            self.appslist[app_name] = (f"{time['elapsed']} seconds")
 
 def update_graph(timedisplay):
     fig1, ax1 = plt.subplots(figsize=(7,4))
     try:
         ax1.clear()
-        smalllist = {}
         smalllist = AppReader.appslist
-        #If there are more than 15 apps, only display the top 15
         if len(smalllist) > 25:
             smalllist = dict(list(smalllist.items())[:25])
         app_names = list(smalllist.keys())
@@ -160,9 +166,7 @@ def piechart():
     fig2, ax2 = plt.subplots(figsize=(7,4))
     try:
         ax2.clear()
-        smalllist = {}
         smalllist = AppReader.appslist
-        #If there are more than 10 apps, only display the top 10
         if len(smalllist) > 10:
             otherlist = dict(list(smalllist.items())[9:])
             otherlist = [int(round(float(time.split(" ")[0]), 0)) for time in otherlist.values()]
@@ -171,11 +175,8 @@ def piechart():
                 totalsum += otherlist[i]
             smalllist = dict(list(smalllist.items())[:9])
             smalllist["Other"] = f"{totalsum} seconds"
-        #Sort smalllist from largest to smallest value
         smalllist = dict(sorted(smalllist.items(), key=lambda x: int(round(float(x[1].split(" ")[0]), 0)), reverse=True))
         
-            
-                        
         app_names = list(smalllist.keys())
         total = 0
         for i in (smalllist.values()):
@@ -207,8 +208,6 @@ def piechart():
         time.sleep(2)
         pass
 
-#Recommended next avenue is to add alternative graph methods such as time based records e.g. previous day, week, month, year.
-    
 def scan():
     while True:
         AppReader.AppRunning(AppReader)
@@ -217,26 +216,42 @@ def scan():
         AppReader.AppTimer(AppReader)
         AppReader.AppRelease(AppReader)
 
-#Update json and store json need to be edited to account for apptime library changes
 def UpdateJson(apptime, path):
-    with open (f"{path}", "w") as f:
+    with open(f"{path}", "w") as f:
         json.dump(apptime, f)
-    
-        
-AppReader.__init__(AppReader)
 
-#Load the previously stored json data
+AppReader.__init__(AppReader)
+AppReader.AppRunning(AppReader)
+AppReader.UpdateRunningApps(AppReader)
+AppReader.AppNameEdit(AppReader)
+AppReader.start_session(AppReader)
+AppReader.AppTimer(AppReader)
+AppReader.AppRelease(AppReader)
+
 try:
-    with open(f"{path}", "r") as f:
+    with open (f"{path}", "r") as f:
         appnamelist = json.load(f)
-        AppReader.appsrunning = list(appnamelist.keys())
-        AppReader.apptime.update(dict(appnamelist))
-        AppReader.apptime = appnamelist
+    timelist = list(appnamelist.values())
+    valuelist = []
+    for value in timelist:
+        values = value["elapsed"]
+        values = int(values)
+        valuelist.append(values)
+    x=0
+    for app in appnamelist:
+        appnamelist[app].update({"cur_time": (round(time.time())), "elapsed": valuelist[x]})
+        x+=1
+
+    AppReader.appsrunning = list(appnamelist.keys())
+    AppReader.apptime.update(dict(appnamelist))
+    AppReader.apptime = appnamelist
         
-except:
+except Exception as e:
+    print(f"Data Error:\n")
+    print(f'{e}')
     pass
+
 thread = threading.Thread(target=scan)
-    
 thread.start()
 
 time.sleep(5)
@@ -245,4 +260,6 @@ while True:
     piechart()
     UpdateJson(AppReader.apptime, path)
     time.sleep(0.5)
-    
+    ending_time = int(round(time.time(), 0))
+    with open(f"{truepath}/SequentialEndingTime.json", "w") as f:
+        json.dump({"end_time": ending_time}, f)

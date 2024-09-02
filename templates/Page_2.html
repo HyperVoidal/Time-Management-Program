@@ -127,7 +127,7 @@
                 {{ form.csrf_token }}
                 <p>
                     {{ form.Task.label }}
-                    {{ form.Task(size=20) }}
+                    {{ form.Task(cols=20) }}
                 </p>
                 {% if form.Task.errors %}
                     <ul class="errors">
