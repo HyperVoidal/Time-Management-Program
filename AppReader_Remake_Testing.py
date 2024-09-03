@@ -8,12 +8,29 @@ import os
 import threading
 import json
 import traceback
+from datetime import datetime
 
 truepath = os.path.dirname(os.path.abspath(__file__))
 path = truepath  + "\\static\\AppReaderData.json"
 columngraphpath = truepath + "\\static\\Column.png"
 piechartpath = truepath + "\\static\\Pie.png"
 timedisplay = "Seconds"
+day = (str(datetime.today()).split("-"))[1]
+with open (f"{truepath}//day.json", "w") as f:
+    json.dump(day, f)
+
+def checkday(day):
+    with open (f"{truepath}//day.json", "r") as f:
+        day = json.load(f)
+        
+    daycheck = (str(datetime.today()).split("-"))[1]
+    if daycheck != day:
+        day = (str(datetime.today()).split('-'))[1]
+        with open (f"{truepath}//day.json", "w") as f:
+            json.dump(day, f)
+        return False
+    else:
+        return True
 
 class AppReader():
     def __init__(self):
@@ -22,6 +39,7 @@ class AppReader():
         self.apptime = {}
         self.appslist = {}
         self.endingtime = 0
+        self.dailytime = {}
 
     def AppNameEdit(self):
         modified_apps = []
@@ -58,6 +76,7 @@ class AppReader():
         self.appsrunning = [app for app in self.appsrunning if app in current_running_apps]
 
     def AppTimer(self):
+        #Main timers
         current_time = round(time.time())
         for app in self.appsrunning:
             if app in self.apptime:
@@ -71,7 +90,29 @@ class AppReader():
                     print(f"Error: appchoose for {app} is not properly formatted. Current value: {self.apptime[app]}")
             else:
                 self.apptime[app] = {'cur_time': current_time, 'elapsed': 0}
-
+        
+        #Daily Time
+        if checkday(day):
+            for app in self.appsrunning:
+                if app in self.dailytime:
+                    if isinstance(self.dailytime[app], dict) and 'cur_time' in self.apptime[app]:
+                        appchoose = self.dailytime[app]
+                        elapsed_times = int(round(current_time - appchoose['cur_time']))
+                        elapsed_time = round(elapsed_times, 0)
+                        self.dailytime[app]['elapsed'] += elapsed_time
+                        self.dailytime[app]['cur_time'] = current_time
+                    else:
+                        print(f"Error: appchoose for {app} is not properly formatted. Current value: {self.apptime[app]}")
+                else:
+                    self.dailytime[app] = {'cur_time': current_time, 'elapsed': 0}
+            with open (f"{truepath}\\static\\DailyTimeData.json", "w") as f:
+                json.dump(self.dailytime, f)
+        else:
+            with open (f"{truepath}\\static\\DailyTimeData.json", "w") as f:
+                json.dump({}, f)
+                
+        
+        
     def reset_timer(self):
         with open(f"{truepath}\\SequentialEndingTime.json", "r") as f:
             endingtime = f.read()
@@ -95,7 +136,7 @@ class AppReader():
         self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
         for app_name, time in self.apptime.items():
             self.appslist[app_name] = (f"{time['elapsed']} seconds")
-
+                       
 def update_graph(timedisplay):
     fig1, ax1 = plt.subplots(figsize=(7,4))
     try:
@@ -221,6 +262,24 @@ def UpdateJson(apptime, path):
         json.dump(apptime, f)
 
 AppReader.__init__(AppReader)
+try:
+    #Fix for shut-down updates to the dailytimedata dictionary
+    with open(f"{truepath}//static//DailyTimeData.json", "r") as f:
+        dailytimelist = json.load(f)
+    timelist = list(dailytimelist.values())
+    valuelist = []
+    for value in timelist:
+        values = value["elapsed"]
+        values = int(values)
+        valuelist.append(values)
+    x=0
+    for app in dailytimelist:
+        dailytimelist[app].update({"cur_time": (round(time.time())), "elapsed": valuelist[x]})
+        x += 1
+    AppReader.dailytime = dailytimelist
+except:
+    pass
+
 AppReader.AppRunning(AppReader)
 AppReader.UpdateRunningApps(AppReader)
 AppReader.AppNameEdit(AppReader)
@@ -228,7 +287,9 @@ AppReader.start_session(AppReader)
 AppReader.AppTimer(AppReader)
 AppReader.AppRelease(AppReader)
 
+
 try:
+    #Fix for shut-down updates to the appreaderdata dictionary
     with open (f"{path}", "r") as f:
         appnamelist = json.load(f)
     timelist = list(appnamelist.values())
@@ -241,6 +302,9 @@ try:
     for app in appnamelist:
         appnamelist[app].update({"cur_time": (round(time.time())), "elapsed": valuelist[x]})
         x+=1
+        
+
+    
 
     AppReader.appsrunning = list(appnamelist.keys())
     AppReader.apptime.update(dict(appnamelist))
