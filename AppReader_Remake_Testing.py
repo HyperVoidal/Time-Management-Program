@@ -14,6 +14,7 @@ truepath = os.path.dirname(os.path.abspath(__file__))
 path = truepath  + "\\static\\AppReaderData.json"
 columngraphpath = truepath + "\\static\\Column.png"
 piechartpath = truepath + "\\static\\Pie.png"
+dailytimepath = truepath + "\\static\\DailyTime.png"
 timedisplay = "Seconds"
 day = (str(datetime.today()).split("-"))[1]
 with open (f"{truepath}//day.json", "w") as f:
@@ -40,6 +41,7 @@ class AppReader():
         self.appslist = {}
         self.endingtime = 0
         self.dailytime = {}
+        self.dailytimelist = {}
 
     def AppNameEdit(self):
         modified_apps = []
@@ -136,6 +138,11 @@ class AppReader():
         self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
         for app_name, time in self.apptime.items():
             self.appslist[app_name] = (f"{time['elapsed']} seconds")
+        
+        self.dailytime = dict(sorted(self.dailytime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
+        for app_name, time in self.apptime.items():
+            self.dailytimelist[app_name] = (f"{time['elapsed']} seconds")
+            
                        
 def update_graph(timedisplay):
     fig1, ax1 = plt.subplots(figsize=(7,4))
@@ -249,6 +256,70 @@ def piechart():
         time.sleep(2)
         pass
 
+def dailytimechart(timedisplay):
+    fig3, ax3 = plt.subplots(figsize=(7,4))
+    try:
+        ax3.clear()
+        smalllists = AppReader.dailytimelist
+        if len(smalllists) > 25:
+            smalllists = dict(list(smalllists.items())[:25])
+        app_names = list(smalllists.keys())
+        for i in (smalllists.values()):
+            values = i.split(" ")
+            value = values[0]
+            maximum = max([int(round(float(value.split(" ")[0]), 0)) for value in smalllists.values()])
+            if maximum > 60 and maximum < 3600:
+                timedisplay = "Minutes"
+                break
+            elif maximum > 3600:
+                timedisplay = "Hours"
+                break
+            else:
+                pass
+            
+        if timedisplay == "Seconds":
+            times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllists.values()]
+        elif timedisplay == "Minutes":
+            times = [(int(round(float(time.split(' ')[0]), 0)))/60 for time in smalllists.values()]
+        elif timedisplay == "Hours":
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllists.values()]
+        elif timedisplay == "Days":
+            times = [(int(round(float(time.split(" ")[0]), 0)))/86400 for time in smalllists.values()]
+        else:
+            print("Error: Invalid time display. Defaulting to hours.")
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllists.values()]
+            timedisplay = "Hours"
+                
+        color_indices = np.arange(len(app_names))
+        cmap = plt.colormaps.get_cmap("twilight")
+        colors = [cmap(index*15) for index in color_indices]
+        appernames = []
+        appernames.extend(app_names)
+        for i in range(len(app_names)):
+            for i in range(len(app_names)):
+                if len(app_names[i]) > 23:
+                    theappnames = app_names[i][:20] + "..."
+                    appernames[i] = theappnames
+
+        ax3.bar(appernames, times, color=colors, edgecolor="black")
+        ax3.set_xlabel('App Name')
+        ax3.set_ylabel(f'Time ({timedisplay})')
+        ax3.set_title('App Usage Time')
+        plt.grid(True, which="both", linestyle="--", linewidth=0.5, color="gray", axis="y")
+        plt.xticks(rotation = 45, ha="right")
+        plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
+        plt.savefig(dailytimepath)
+        plt.close(fig3)
+    except Exception as e:
+        print("GRAPH ERROR:")
+        print(e)
+        print(traceback.format_exc())
+        time.sleep(2)
+        pass
+
+    return timedisplay
+
+        
 def scan():
     while True:
         AppReader.AppRunning(AppReader)
@@ -322,6 +393,7 @@ time.sleep(5)
 while True:
     update_graph(timedisplay)
     piechart()
+    dailytimechart(timedisplay)
     UpdateJson(AppReader.apptime, path)
     time.sleep(0.5)
     ending_time = int(round(time.time(), 0))

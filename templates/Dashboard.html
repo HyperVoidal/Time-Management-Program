@@ -7,7 +7,14 @@
         <style>
             .column{
                 float: left;
-                width: 50%
+            }
+
+            .right{
+                width:35%;
+            }
+
+            .left{
+                width:65%;
             }
 
             .row: :after{
@@ -100,8 +107,15 @@
 
 <body>
     <h1>Dashboard</h1>
-    {% block DailyTasks %}
+    {% block DailyTime %}
     <div class="column left">
+        <h2>Daily Time</h2>
+        <img alt="Unable to load graph, please try again in a few seconds!" src={{url_for('static', filename='DailyTime.png')}}>
+        </div>
+    {% endblock DailyTime %}
+    
+    {% block DailyTasks %}
+    <div class="column right">
         <h2>Daily Tasks</h2>
         <br>
         {% if DataStoreTasks != {} %}
@@ -112,18 +126,8 @@
                     <span class="tooltiptext">{{ DataStoreTasks[task] }}</span>
                 </div>
             {% endfor %}
-        </li>
         {% endif %}
-    {% endblock %}
+            </div>
+    {% endblock DailyTasks %}
     
-    {% block DailyTime %}
-    <div class="column right">
-        <h2>Daily Time</h2>
-        {% comment %} 
-        Create a way to find the current times of the country that the user is in
-        Create a function to add to AppReader code that creates a graph from the data of only a single day
-        The data for the graph should be stored in a seperate json file from the rest of initial
-        The data for the graph should reset at 12am every day as determined by the user's time zone
-        {% endcomment %}
-    {% endblock %}
 </body>
