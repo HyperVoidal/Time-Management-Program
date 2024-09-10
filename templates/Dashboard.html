@@ -5,16 +5,24 @@
         <title>AppScan - Page 2</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
+            h1 {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+            h2 {
+                margin-left: 20px;
+                margin-right: 20px;
+            }
             .column{
                 float: left;
             }
 
             .right{
-                width:35%;
+                width:50%;
             }
 
             .left{
-                width:65%;
+                width:50%;
             }
 
             .row: :after{
@@ -107,15 +115,8 @@
 
 <body>
     <h1>Dashboard</h1>
-    {% block DailyTime %}
-    <div class="column left">
-        <h2>Daily Time</h2>
-        <img alt="Unable to load graph, please try again in a few seconds!" src={{url_for('static', filename='DailyTime.png')}}>
-        </div>
-    {% endblock DailyTime %}
-    
     {% block DailyTasks %}
-    <div class="column right">
+    <div class="column left">
         <h2>Daily Tasks</h2>
         <br>
         {% if DataStoreTasks != {} %}
@@ -129,5 +130,12 @@
         {% endif %}
             </div>
     {% endblock DailyTasks %}
+
+    {% block DailyTime %}
+    <div class="column right">
+        <h2>Daily Time</h2>
+        <img alt="Unable to load graph, please try again in a few seconds!" src={{url_for('static', filename='DailyTime.png')}}>
+        </div>
+    {% endblock DailyTime %}
     
 </body>

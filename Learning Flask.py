@@ -55,8 +55,14 @@ def page_2():
                         taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:]
                     elif len(str(taskcheck[i])) > 60 and len(str(taskcheck[i])) < 90:
                         taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:60] + "- " + taskcheck[i][60:]
-                    elif len(str(taskcheck[i])) > 90:
+                    elif len(str(taskcheck[i])) > 90 and len(str(taskcheck[i])) < 120:
                         taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:60] + "- " + taskcheck[i][60:90] + "- " + taskcheck[i][90:]
+                    elif len(str(taskcheck[i])) > 120 and len(str(taskcheck[i])) < 150:
+                        taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:60] + "- " + taskcheck[i][60:90] + "- " + taskcheck[i][90:120] + "- " + taskcheck[i][120:]
+                    elif len(str(taskcheck[i])) > 150 and len(str(taskcheck[i])) < 180:
+                        taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:60] + "- " + taskcheck[i][60:90] + "- " + taskcheck[i][90:120] + "- " + taskcheck[i][120:150] + "- " + taskcheck[i][150:]
+                    elif len(str(taskcheck[i])) > 180:
+                        taskcheck[i] = taskcheck[i][:30] + "- " + taskcheck[i][30:60] + "- " + taskcheck[i][60:90] + "- " + taskcheck[i][90:120] + "- " + taskcheck[i][120:150] + "- " + taskcheck[i][150:180] + "- " + taskcheck[i][180:]
                     task_desc = " ".join(taskcheck)
                     
                 DataStoreTasks[task] = task_desc

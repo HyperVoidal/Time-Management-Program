@@ -16,17 +16,21 @@ columngraphpath = truepath + "\\static\\Column.png"
 piechartpath = truepath + "\\static\\Pie.png"
 dailytimepath = truepath + "\\static\\DailyTime.png"
 timedisplay = "Seconds"
-day = (str(datetime.today()).split("-"))[1]
+day = (str(datetime.today()).split("-"))[2]
+day = day.split(" ")[0]
 with open (f"{truepath}//day.json", "w") as f:
     json.dump(day, f)
 
 def checkday(day):
     with open (f"{truepath}//day.json", "r") as f:
         day = json.load(f)
-        
-    daycheck = (str(datetime.today()).split("-"))[1]
+    
+    daycheck = (str(datetime.today()).split("-"))[2]
+    daycheck = daycheck.split(" ")[0]
+    
     if daycheck != day:
         day = (str(datetime.today()).split('-'))[1]
+        day = day.split(" ")[0]
         with open (f"{truepath}//day.json", "w") as f:
             json.dump(day, f)
         return False
@@ -139,9 +143,9 @@ class AppReader():
         for app_name, time in self.apptime.items():
             self.appslist[app_name] = (f"{time['elapsed']} seconds")
         
-        self.dailytime = dict(sorted(self.dailytime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
-        for app_name, time in self.apptime.items():
-            self.dailytimelist[app_name] = (f"{time['elapsed']} seconds")
+        self.dailytime = dict(sorted(self.dailytime.items(), key=lambda y: y[1]['elapsed'], reverse=True))
+        for appnames, timse in self.dailytime.items():
+            self.dailytimelist[appnames] = (f"{timse['elapsed']} seconds")
             
                        
 def update_graph(timedisplay):
@@ -260,14 +264,14 @@ def dailytimechart(timedisplay):
     fig3, ax3 = plt.subplots(figsize=(7,4))
     try:
         ax3.clear()
-        smalllists = AppReader.dailytimelist
-        if len(smalllists) > 25:
-            smalllists = dict(list(smalllists.items())[:25])
-        app_names = list(smalllists.keys())
-        for i in (smalllists.values()):
+        dailytimelist = AppReader.dailytimelist
+        if len(dailytimelist) > 25:
+            dailytimelist = dict(list(dailytimelist.items())[:25])
+        app_names = list(dailytimelist.keys())
+        for i in (dailytimelist.values()):
             values = i.split(" ")
             value = values[0]
-            maximum = max([int(round(float(value.split(" ")[0]), 0)) for value in smalllists.values()])
+            maximum = max([int(round(float(value.split(" ")[0]), 0)) for value in dailytimelist.values()])
             if maximum > 60 and maximum < 3600:
                 timedisplay = "Minutes"
                 break
@@ -278,16 +282,16 @@ def dailytimechart(timedisplay):
                 pass
             
         if timedisplay == "Seconds":
-            times = [int(round(float(time.split(" ")[0]), 0)) for time in smalllists.values()]
+            times = [int(round(float(time.split(" ")[0]), 0)) for time in dailytimelist.values()]
         elif timedisplay == "Minutes":
-            times = [(int(round(float(time.split(' ')[0]), 0)))/60 for time in smalllists.values()]
+            times = [(int(round(float(time.split(' ')[0]), 0)))/60 for time in dailytimelist.values()]
         elif timedisplay == "Hours":
-            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllists.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in dailytimelist.values()]
         elif timedisplay == "Days":
-            times = [(int(round(float(time.split(" ")[0]), 0)))/86400 for time in smalllists.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/86400 for time in dailytimelist.values()]
         else:
             print("Error: Invalid time display. Defaulting to hours.")
-            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in smalllists.values()]
+            times = [(int(round(float(time.split(" ")[0]), 0)))/3600 for time in dailytimelist.values()]
             timedisplay = "Hours"
                 
         color_indices = np.arange(len(app_names))
