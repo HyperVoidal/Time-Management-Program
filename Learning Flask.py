@@ -66,7 +66,6 @@ def page_2():
                     task_desc = " ".join(taskcheck)
                     
                 DataStoreTasks[task] = task_desc
-                print(DataStoreTasks)  # For debugging purposes
             else:
                 print("Task or TaskDesc is missing")  # Debugging message for missing data
             
@@ -103,4 +102,12 @@ if __name__ == '__main__':
             DataStoreTasks = json.load(f)
     except:
         print('No data in file')
-    app.run(debug=True)
+
+    os.system('cls')
+    print("")
+    print("Welcome to AppScan - The Personal Support Tool")
+    print("To leave the program, please close the window.")
+    print("To have the program running in the background, please leave the window running")
+    print("To access the data display webapp, visit http://127.0.0.1:5000/dashboard")
+    print("")
+    app.run()

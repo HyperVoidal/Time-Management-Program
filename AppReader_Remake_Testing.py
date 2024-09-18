@@ -16,10 +16,6 @@ columngraphpath = truepath + "\\static\\Column.png"
 piechartpath = truepath + "\\static\\Pie.png"
 dailytimepath = truepath + "\\static\\DailyTime.png"
 timedisplay = "Seconds"
-day = (str(datetime.today()).split("-"))[2]
-day = day.split(" ")[0]
-with open (f"{truepath}//day.json", "w") as f:
-    json.dump(day, f)
 
 def checkday(day):
     with open (f"{truepath}//day.json", "r") as f:
@@ -337,6 +333,12 @@ def UpdateJson(apptime, path):
         json.dump(apptime, f)
 
 AppReader.__init__(AppReader)
+
+day = (str(datetime.today()).split("-"))[2]
+day = day.split(" ")[0]
+with open (f"{truepath}//day.json", "w") as f:
+    json.dump(day, f)
+    
 try:
     #Fix for shut-down updates to the dailytimedata dictionary
     with open(f"{truepath}//static//DailyTimeData.json", "r") as f:
