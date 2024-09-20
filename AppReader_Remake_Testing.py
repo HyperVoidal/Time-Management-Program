@@ -200,6 +200,8 @@ def update_graph(timedisplay):
         plt.xticks(rotation = 45, ha="right")
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(columngraphpath)
+        ax1.clear()
+        fig1.clear()
         plt.close(fig1)
     except Exception as e:
         print("GRAPH ERROR:")
@@ -248,6 +250,8 @@ def piechart():
         ax2.legend(appernames, title="Legend", loc="center left", bbox_to_anchor=(-0.1, 0))
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(piechartpath)
+        ax2.clear()
+        fig2.clear()
         plt.close(fig2)
     except Exception as e:
         print("GRAPH ERROR:")
@@ -309,6 +313,8 @@ def dailytimechart(timedisplay):
         plt.xticks(rotation = 45, ha="right")
         plt.subplots_adjust(left=0.2,bottom=0.4, top = 0.9, right = 0.9)
         plt.savefig(dailytimepath)
+        ax3.clear()
+        fig3.clear()
         plt.close(fig3)
     except Exception as e:
         print("GRAPH ERROR:")

@@ -1,6 +1,4 @@
 from flask import Flask, request, render_template
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
