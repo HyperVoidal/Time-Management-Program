@@ -9,6 +9,7 @@ Other features including a checklist function, and different graphs for total ti
 
 # Getting Started
 To get started with this software, first make sure to download, install, and unzip the file into it's own directory. 
+When installing, make sure to choose the file in the "Dashboard" branch. I have been using the branches as semi-checkpoints and decided not to reintegrate them into the main code for the time being. I will reintegrate these another time.
 Anywhere is fine, but the base C: drive is the most optimal location.
 
 Next, if you haven't installed the python library, it is best to install that first, along with the python library manager "pip".
