@@ -30,7 +30,7 @@ After installing python, enter the following commands into your command prompt i
 
 These commands are essential to the functionality of the program, as they are libraries that must be installed for the program to function.
 
-After the installation of the libraries, open the python file "" and run it. 
+After the installation of the libraries, open the python file "Learning Flask.py" and run it. 
 
 If at any point, an error message returns, cancel the active terminal window and rerun the program, it needed to boot from a fresh start and should be immediately operational afterwards.
 
