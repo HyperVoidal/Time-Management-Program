@@ -116,23 +116,38 @@ class AppReader():
         
         
     def reset_timer(self):
-        with open(f"{truepath}\\SequentialEndingTime.json", "r") as f:
-            endingtime = f.read()
-            endingtime = json.loads(endingtime)
-        
-        ending_time = endingtime["end_time"]
-        self.endingtime = ending_time
+        try:
+            with open(f"{truepath}\\SequentialEndingTime.json", "r") as f:
+                endingtime = f.read()
+                endingtime = json.loads(endingtime)
+            
+            ending_time = endingtime["end_time"]
+            self.endingtime = ending_time
+        except:
+            self.endingtime = round(time.time())
+            with open(f"{truepath}\\SequentialEndingTime.json", "w") as f:
+                json.dump({"end_time": self.endingtime}, f)
+            print("Bypassing ending time - no data found.")
+            print("Likely cause - first time running the program.")
+            print("Please restart the program to fix this issue.")
+
 
     def start_session(self):
-        self.reset_timer(AppReader)
-        current_time = round(time.time())
-        time_diff = current_time - self.endingtime
-        for app in self.apptime:
-            if 'elapsed' in self.apptime[app]:
-                self.apptime[app]['elapsed'] += time_diff
-            else:
-                self.apptime[app]['elapsed'] = time_diff
-            self.apptime[app]['cur_time'] = current_time
+        try:
+            self.reset_timer(AppReader)
+            current_time = round(time.time())
+            time_diff = current_time - self.endingtime
+            for app in self.apptime:
+                if 'elapsed' in self.apptime[app]:
+                    self.apptime[app]['elapsed'] += time_diff
+                else:
+                    self.apptime[app]['elapsed'] = time_diff
+                self.apptime[app]['cur_time'] = current_time
+        except:
+            print("Start session function failed - no data found.")
+            print("Likely cause - first time running the program.")
+            print("Bypassing start session function.")
+            print("Please restart the program to fix this issue.")
 
     def AppRelease(self):
         self.apptime = dict(sorted(self.apptime.items(), key=lambda x: x[1]['elapsed'], reverse=True))
