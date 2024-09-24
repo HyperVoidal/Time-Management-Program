@@ -1,5 +1,6 @@
 # Time Management Program
  Time management program including time spent on programs and integrated checklist. In active development.
+ This information is better updated and written on the "dashboard" branch. Please download and use that branch if you want the latest versions, information, and the superior version of the "readme" instructions.
 
 # Info for Beginners
 This program is designed to allow you to better understand your activities and time spent in different tasks on your computer. 
